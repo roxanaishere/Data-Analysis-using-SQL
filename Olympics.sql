@@ -1,4 +1,4 @@
-/* This is the casee study project I worked on during the <code>SQL for Business Analyst</code> track. */
+/* This is the casee study project I worked on during the SQL for Business Analyst track. */
 /* In this project, I served as a data scientist for a sports marketing company. The company has recently been asked to market perhaps the largest global sports event in the world: the Olympics. 
 I will explore the dataset to offer insights for the executive team to move forward.*/
 /* I will focus on building the base report for each element in the final dashboard.*/
