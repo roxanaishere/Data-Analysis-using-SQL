@@ -1,101 +1,13 @@
-DROP TABLE IF EXISTS "athletes";
-	CREATE TABLE athletes(
-	 	"id" int,
-		name VARCHAR(255),
-		gender VARCHAR(8),
-		age int,
-		height int,
-		weight int);
+/* This is the casee study project I worked on during the <code>SQL for Business Analyst</code> track. */
+/* In this project, I served as a data scientist for a sports marketing company. The company has recently been asked to market perhaps the largest global sports event in the world: the Olympics. 
+I will explore the dataset to offer insights for the executive team to move forward.*/
+/* I will focus on building the base report for each element in the final dashboard.*/
 
-DROP TABLE IF EXISTS "summer_games";
-	CREATE TABLE summer_games(
-	 	sport VARCHAR(255),
-		event VARCHAR(255),
-		year date,
-		athlete_id int,
-		country_id int,
-		bronze float,
-		silver float,
-		gold float);
-
-DROP TABLE IF EXISTS "winter_games";
-	CREATE TABLE winter_games(
-	 	sport VARCHAR(255),
-		event VARCHAR(255),
-		year date,
-		athlete_id int,
-		country_id int,
-		bronze float,
-		silver float,
-		gold float);
-
-DROP TABLE IF EXISTS "countries";
-	CREATE TABLE countries(
-	 	"id" int,
-		country VARCHAR(255),
-		region varchar(50));
-
-DROP TABLE IF EXISTS "country_stats";
-	CREATE TABLE country_stats(
-	 	"year" VARCHAR(255),
-		country_id int,
-		gdp float,
-		pop_in_millions VARCHAR(255),
-		nobel_prize_winners int);
-
-COPY athletes
-	FROM PROGRAM 'curl "http://assets.datacamp.com/production/repositories/3815/datasets/a5c114363d3f60f514a30683969b1b48b7bc0fe8/athletes_updated.csv"' (DELIMITER ',', FORMAT CSV, HEADER);
-
-COPY summer_games
-	FROM PROGRAM 'curl "http://assets.datacamp.com/production/repositories/3815/datasets/174bc4db929ab36891538612c6b1e2cdce11a73b/summer_games_updated.csv"' (DELIMITER ',', FORMAT CSV, HEADER);
-
-COPY winter_games
-	FROM PROGRAM 'curl "http://assets.datacamp.com/production/repositories/3815/datasets/1aec560f1e9d22956288a19b1f46f2a21dee0a74/winter_games_updated.csv"' (DELIMITER ',', FORMAT CSV, HEADER);
-
-COPY countries
-	FROM PROGRAM 'curl "https://assets.datacamp.com/production/repositories/3815/datasets/3ef4cdfd931e29bc3b1e612d518cf825d56a0362/countries_messy.csv"' (DELIMITER ',', FORMAT CSV, HEADER);
-
-COPY country_stats
-	FROM PROGRAM 'curl "http://assets.datacamp.com/production/repositories/3815/datasets/b08d09328a1ab49397e671ee196e957f350bc672/country_stats_updated.csv"' (DELIMITER ',', FORMAT CSV, HEADER);
-	
-
--- Build base report that shows Age of Oldest Athlete by Region
+---------------------------------------------
+-- Report 1: Most Decorated Summer Athletes--
+---------------------------------------------
 SELECT 
-	region, 
-    max(age) AS age_of_oldest_athlete
-FROM summer_games
-JOIN athletes
-on summer_games.athlete_id = athletes.id
-JOIN countries
-on summer_games.country_id = countries.id
-GROUP BY region;
-
--- look at all sports in one centralized report.
-SELECT 
-	sport, 
-    count(distinct event) AS events
-FROM summer_games
-group by sport
-UNION
-SELECT 
-	sport, 
-    count(distinct event) as events
-FROM winter_games
-group by sport
-order by events desc;
-
--- Setup a query that shows bronze_medal by country
-SELECT 
-	country, 
-    sum(bronze) AS bronze_medals
-FROM summer_games AS s
-JOIN countries AS c
-ON s.country_id = c.id
-GROUP BY country;
-
--- Most Decorated Summer Athletes
-SELECT 
-	a.name AS athlete_name, 
+    a.name AS athlete_name, 
     count(s.gold) AS gold_medals
 FROM summer_games AS s
 JOIN athletes AS a
@@ -104,7 +16,9 @@ GROUP BY athlete_name
 having count(s.gold) >= 3
 ORDER BY gold_medals desc;
 
--- Report 2: Athletes Representing Nobel-Prize Winning Countries
+------------------------------------------------------------------
+-- Report 2: Athletes Representing Nobel-Prize Winning Countries--
+------------------------------------------------------------------
 SELECT 
     event,
     -- Add the gender field
@@ -134,7 +48,9 @@ GROUP BY event
 ORDER BY athletes desc
 LIMIT 10;
 
--- report 3: medals vs population rate
+----------------------------------------
+-- Report 3: medals vs population rate--
+----------------------------------------
 SELECT 
 	-- Clean the country field
     left(replace(trim(upper(c.country)),'.',''),3) as country_code,
@@ -155,8 +71,9 @@ GROUP BY c.country, pop_in_millions
 ORDER BY medals_per_million desc
 LIMIT 25;
 
-
--- Report 4: Tallest athletes and % GDP by region
+---------------------------------------------------
+-- Report 4: Tallest athletes and % GDP by region--
+---------------------------------------------------
 SELECT
 	-- Pull in region and calculate avg tallest height
     region,
